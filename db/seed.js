@@ -1,15 +1,17 @@
+// -----IMPORTS-----
 const {
     client,
-    getAllUsers,
     createUser,
     updateUser,
-    getAllPosts,
-    getPostsByUser,
+    getAllUsers,
     getUserById,
     createPost,
-    updatePost
+    updatePost,
+    getAllPosts,
+    getPostsByUser
 } = require("./index");
 
+// -----DROP TABLES-----
 async function dropTables() {
     try {
         console.log("Starting to drop tables...");
@@ -24,6 +26,7 @@ async function dropTables() {
     }
 }
 
+// -----CREATE TABLES-----
 async function createTables () {
     try {
         console.log("Starting to build tables...");
@@ -51,13 +54,26 @@ async function createTables () {
     }
   }
 
+//-----CREATE INITIAL USERS-----
 async function createInitialUsers() {
     try {
         console.log("Starting to create users...");
 
-        const albert = await createUser({ username: 'albert', password: 'bertie99', name: 'Al Bert', location: 'Sidney, Austrailia' });
-        const sandra = await createUser({ username: 'sandra', password: '2sandy4me', name: 'Just Sandra', location: "Ain't tellin'" });
-        const glamgal = await createUser({ username: 'glamgal', password: 'soglam', name: 'Joshua', location: 'Upper East Side' });
+        const albert = await createUser({
+            username: 'albert', 
+            password: 'bertie99', 
+            name: 'Al Bert', 
+            location: 'Sidney, Austrailia' });
+        const sandra = await createUser({ 
+            username: 'sandra', 
+            password: '2sandy4me', 
+            name: 'Just Sandra', 
+            location: "Ain't tellin'" });
+        const glamgal = await createUser({ 
+            username: 'glamgal', 
+            password: 'soglam', 
+            name: 'Joshua', 
+            location: 'Upper East Side' });
         // console.log(albert);
         // console.log(sandra);
         // console.log(glamgal);
@@ -68,6 +84,7 @@ async function createInitialUsers() {
     }
 }  
 
+// -----CREATE INITIAL POSTS-----
 async function createInitialPosts() {
     try {
         console.log("Starting createInitialPosts func...");
@@ -76,7 +93,7 @@ async function createInitialPosts() {
         await createPost({
             authorId: albert.id,
             title: "Albert's First Post",
-            content: "This is my first post. I hope I love writing blogs as much as I love reading them."
+            content: "This is my first post. Grammar eludes me."
         });
 
         await createPost({
@@ -96,6 +113,7 @@ async function createInitialPosts() {
     }
 }
 
+// -----REBUILD DB-----
 async function rebuildDB () {
     try {
         client.connect();
@@ -109,6 +127,7 @@ async function rebuildDB () {
     }
 }
 
+// -----TEST DB-----
 async function testDB() {
     try {
       console.log("Starting to test database...");

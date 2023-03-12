@@ -1,17 +1,8 @@
 const { Client } = require("pg");
 const client = new Client('postgres://localhost:5432/juicebox-dev');
 
-// GET ALL USERS ------
-async function getAllUsers() {
-    const { rows } = await client.query(`
-      SELECT id, username, name, location, active
-      FROM users;
-    `);
-
-    return rows;
-}
-
-// CREATE A USER -----
+// -----USER METHODS-----
+// -----CREATE A USER-----
 async function createUser({
     username, 
     password,
@@ -25,13 +16,13 @@ async function createUser({
         ON CONFLICT (username) DO NOTHING
         RETURNING *;
         `, [username, password, name, location]);
-        return user
+        return user;
     } catch (error) {
     throw error;
     }
 }
 
-// UPDATE A USER -----
+// -----UPDATE A USER-----
 async function updateUser(id, fields = {}) {
     const setString = Object.keys(fields).map(
       (key, index) => `"${ key }"=$${ index + 1 }`
@@ -55,47 +46,43 @@ async function updateUser(id, fields = {}) {
     }
 }
 
-// GET USER BY ID -----
-async function getUserById(userId) {
-    try {
-        const {rows} = await client.query(`
-        SELECT * FROM users
-        WHERE id = ${userId};
-        `)
-        if(!rows.length) return null;
-        delete rows.password;
-        const posts = await getPostsByUser(userId);
-        rows.posts = posts
+// -----GET ALL USERS-----
+async function getAllUsers() {
+    try{
+        const { rows } = await client.query(`
+            SELECT id, username, name, location, active
+            FROM users;
+        `);
+
         return rows;
     } catch (error) {
-        console.log(error);
+        throw error;
     }
 }
 
-// GET ALL POSTS -----
-async function getAllPosts() {
-    const { rows } = await client.query(
-      `SELECT "authorId", title, content
-      FROM posts;
-    `);
-
-    return rows;
-}
-
-// GET POSTS BY USER -----
-async function getPostsByUser(userId) {
+// -----GET USER BY ID-----
+async function getUserById(userId) {
     try {
-      const { rows } = await client.query(`
-        SELECT * FROM posts
-        WHERE "authorId"=${ userId };
-      `);
-      return rows;
+        const { rows: [ user ] } = await client.query(`
+            SELECT id, username, name, location, active
+            FROM users
+            WHERE id=${ userId }
+        `);
+  
+        if (!user) {
+            return null
+        }
+        user.posts = await getPostsByUser(userId);
+  
+        return user;
     } catch (error) {
-      throw error;
+        throw error;
     }
 }
 
-// CREATE A POST -----
+
+// -----POST METHODS-----
+// -----CREATE A POST-----
 async function createPost({
     authorId, 
     title,
@@ -107,62 +94,119 @@ async function createPost({
         VALUES ($1, $2, $3)
         RETURNING *;
         `, [authorId, title, content]);
-        return post
+        return post;
     } catch (error) {
     throw error;
     }
 }
 
-// UPDATE A POST
-async function updatePost(id, {title, content}) {
+// -----UPDATE A POST-----
+async function updatePost(id, fields = {}) {
+    const setString = Object.keys(fields).map(
+      (key, index) => `"${ key }"=$${ index + 1 }`
+    ).join(', ');
+
+    if (setString.length === 0) {
+      return;
+    }
+  
     try {
-        const {rows} = await client.query(`
-        UPDATE posts
-        SET title = $1, content = $2
-        WHERE id = $3
-        RETURNING *;
-        `,[title, content, id]);
-        return rows;
+        const { rows: [ post ] } = await client.query(`
+            UPDATE posts
+            SET ${ setString }
+            WHERE id=${ id }
+            RETURNING *;
+        `, Object.values(fields));
+  
+        return post;
     } catch (error) {
-        console.log(error);
+        throw error;
     }
 }
+
+// -----GET ALL POSTS-----
+async function getAllPosts() {
+    try {
+        const { rows } = await client.query(`
+        SELECT *
+        FROM posts;
+        `);
+  
+        return rows;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// -----GET POSTS BY USER-----
+async function getPostsByUser(userId) {
+    try {
+        const { rows } = await client.query(`
+            SELECT * FROM posts
+            WHERE "authorId"=${ userId };
+        `);
+        return rows;
+    } catch (error) {
+      throw error;
+    }
+}
+
 
 // -----EXPORTS-----
 module.exports = {
     client,
-    getAllUsers,
     createUser,
     updateUser,
-    getAllPosts,
-    getPostsByUser,
+    getAllUsers,
     getUserById,
     createPost,
-    updatePost
+    updatePost,
+    getAllPosts,
+    getPostsByUser
 }
 
 
-// UPDATE A POST -----
-// async function updatePost(id, fields = {}) {
-//     const setString = Object.keys(fields).map(
-//       (key, index) => `"${ key }"=$${ index + 1 }`
-//     ).join(', ');
-  
-//     if (setString.length === 0) {
-//       return;
-//     }
-  
+
+
+// -----UPDATE A POST----- chase
+// async function updatePost(id, {title, content}) {
 //     try {
-//       const { rows: [ post ] } = await client.query(`
+//         const {rows} = await client.query(`
 //         UPDATE posts
-//         SET ${ setString }
-//         WHERE id=${ id }
+//         SET title = $1, content = $2
+//         WHERE id = $3
 //         RETURNING *;
-//       `, Object.values(fields));
-  
-//       return post;
+//         `,[title, content, id]);
+//         return rows;
 //     } catch (error) {
-//       throw error;
+//         console.log(error);
+//     }
+// }
+
+// -----GET ALL POSTS-----
+// async function getAllPosts() {
+//     const { rows } = await client.query(
+//       `SELECT "authorId", title, content
+//       FROM posts;
+//     `);
+
+//     return rows;
+// }
+
+// chase - kinda works
+// async function getUserById(userId) {
+//     try {
+//         const {rows} = await client.query(`
+//         SELECT * FROM users
+//         WHERE id = ${userId};
+//         `)
+//         if(!rows.length) return null;
+//         delete rows.password;
+//         const posts = await getPostsByUser(userId);
+//         rows.posts = posts
+//         return rows;
+//     } catch (error) {
+//         console.log(error);
 //     }
 // }
 
