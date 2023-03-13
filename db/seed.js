@@ -8,11 +8,6 @@ const {
     createPost,
     updatePost,
     getAllPosts,
-    getPostsByUser,
-    addTagsToPost,
-    createTags,
-    createPostTag,
-    getPostById,
     getPostsByTagName
 } = require("./index");
 
@@ -90,9 +85,7 @@ async function createInitialUsers() {
             password: 'soglam', 
             name: 'Joshua', 
             location: 'Upper East Side' });
-        // console.log(albert);
-        // console.log(sandra);
-        // console.log(glamgal);
+            
         console.log("Finished creating users!");
     } catch(error) {
         console.error("Error creating users!");
@@ -132,6 +125,7 @@ async function createInitialPosts() {
         throw error;
     }
 }
+
 
 // -----REBUILD DB-----
 async function rebuildDB () {

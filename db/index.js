@@ -104,7 +104,7 @@ async function createPost({
     }
 }
 
-// -----UPDATE POST WITH TAGS
+// -----UPDATE POST WITH TAGS-----
 async function updatePost(postId, fields = {}) {
 
     const { tags } = fields;
@@ -184,7 +184,7 @@ async function getPostsByUser(userId) {
 }
 
 // -----TAGS METHODS-----
-// -----CREATE TAGS-----CP\\\\\
+// -----CREATE TAGS-----
 async function createTags(tagList) {
     if (tagList.length === 0) { 
       return; 
@@ -216,7 +216,7 @@ async function createTags(tagList) {
     }
 }
 
-// -----CREATE POST TAGS-----CP\\\\\
+// -----CREATE POST TAGS-----
 async function createPostTag(postId, tagId) {
     try {
     await client.query(`
@@ -229,7 +229,7 @@ async function createPostTag(postId, tagId) {
     }
 }
 
-// -----ADD TAGS TO POST-----\\\\\CP
+// -----ADD TAGS TO POST-----
 async function addTagsToPost(postId, tagList) {
     try {
         const createPostTagPromises = tagList.map(
@@ -244,7 +244,7 @@ async function addTagsToPost(postId, tagList) {
     }
 }
 
-// -----GET POSTS BY ID-----\\\\\CP
+// -----GET POSTS BY ID-----
 async function getPostById(postId) {
     try {
         const { rows: [ post ]  } = await client.query(`
@@ -277,7 +277,7 @@ async function getPostById(postId) {
     }
 }
 
-// -----GET POSTS BY TAG NAME-----\\\\\CP
+// -----GET POSTS BY TAG NAME-----
 async function getPostsByTagName(tagName) {
     try {
         const { rows: postIds } = await client.query(`
@@ -307,10 +307,5 @@ module.exports = {
     createPost,
     updatePost,
     getAllPosts,
-    getPostsByUser,
-    createTags,
-    createPostTag,
-    addTagsToPost,
-    getPostById,
     getPostsByTagName
 }
